@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AlphaPay.id - Reseller PPOB, API Pembayaran, dan Infrastruktur Pembayaran Indonesia</title>
+  <meta name="description" content="AlphaPay.id adalah platform reseller PPOB dan API pembayaran. Mulai dari pulsa, paket data, PLN, PDAM, multifinance, e-wallet, hingga virtual account. Cepat, aman, dan lengkap." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <meta property="og:title" content="AlphaPay.id - Reseller PPOB & API Pembayaran" />
+  <meta property="og:description" content="Kembali beroperasi di 2025. Infrastruktur PPOB untuk reseller dan integrator. Layanan lengkap, harga kompetitif, keamanan terukur." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://alphapay.id/" />
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630'%3E%3Crect fill='%230ea5e9' width='100%25' height='100%25'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter,Arial' font-size='64'%3EAlphaPay.id%3C/text%3E%3C/svg%3E" />
+
+  <style>
+    :root{
+      --bg:#0b1220; /* background dark */
+      --card:#0f172a;
+      --muted:#94a3b8;
+      --text:#e2e8f0;
+      --brand:#0ea5e9; /* sky-500 */
+      --brand-2:#38bdf8; /* sky-400 */
+      --ok:#10b981;
+      --warn:#f59e0b;
+      --err:#ef4444;
+      --ring: 0 0 0 3px rgba(14,165,233,.35);
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(2,8,23,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
+      background: linear-gradient(180deg, #06101c 0%, #0b1220 40%, #0b1220 100%);
+      color:var(--text);
+    }
+    a{color:var(--brand)}
+    .container{width:min(1200px, 100% - 2rem); margin-inline:auto}
+
+    /* Header */
+    .topbar{position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.2) blur(10px); background:rgba(2,8,23,.6); border-bottom:1px solid rgba(148,163,184,.12)}
+    .topbar-inner{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0}
+    .brand{display:flex; align-items:center; gap:10px; text-decoration:none}
+    .logo{width:36px; height:36px; border-radius:10px; background: conic-gradient(from 220deg, var(--brand), var(--brand-2)); display:grid; place-items:center; box-shadow: var(--shadow)}
+    .logo svg{width:22px; height:22px; fill:white}
+    .brand-title{font-weight:700; letter-spacing:.2px}
+
+    /* Nav */
+    nav{
+      display:flex; align-items:center; gap:14px;
+    }
+    .nav-links{display:none; align-items:center; gap:10px}
+    .nav-item{position:relative}
+    .nav-btn{appearance:none; border:0; background:transparent; color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600}
+    .nav-btn[aria-current="page"], .nav-btn:hover{background:rgba(56,189,248,.14)}
+    .dropdown{position:absolute; top:100%; left:0; background:rgba(2,8,23,.98); border:1px solid rgba(148,163,184,.12); border-radius:12px; padding:8px; display:none; min-width:280px; box-shadow: var(--shadow)}
+    .nav-item:focus-within .dropdown, .nav-item:hover .dropdown{display:grid}
+    .dropdown a{display:flex; gap:10px; text-decoration:none; color:var(--text); padding:10px; border-radius:10px}
+    .dropdown a:hover{background:rgba(56,189,248,.12)}
+    .pill{padding:.2rem .55rem; border-radius:999px; background:rgba(14,165,233,.18); color:#cbefff; font-size:.75rem; font-weight:700; letter-spacing:.2px}
+
+    /* Actions */
+    .actions{display:flex; align-items:center; gap:10px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid rgba(148,163,184,.16); background:rgba(148,163,184,.08); color:var(--text); text-decoration:none; font-weight:700; cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .btn.primary{background:linear-gradient(180deg, var(--brand-2), var(--brand)); border-color:transparent; color:white}
+
+    /* Mobile menu */
+    .burger{display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:10px; border:1px solid rgba(148,163,184,.16); background:rgba(148,163,184,.08)}
+    .drawer{position:fixed; inset:0 0 0 auto; width:min(340px, 90%); background:#0a1323; border-left:1px solid rgba(148,163,184,.16); transform:translateX(102%); transition:transform .25s ease; z-index:49; display:flex; flex-direction:column}
+    .drawer.open{transform:none}
+    .drawer header{display:flex; align-items:center; justify-content:space-between; padding:14px; border-bottom:1px solid rgba(148,163,184,.12)}
+    .drawer nav{display:block; padding:10px 14px; overflow:auto}
+    .drawer details{border:1px solid rgba(148,163,184,.16); border-radius:12px; margin:10px 0; background:rgba(148,163,184,.06)}
+    .drawer summary{list-style:none; cursor:pointer; padding:12px 14px; font-weight:700}
+    .drawer a{display:block; padding:10px 14px; text-decoration:none; color:var(--text)}
+
+    /* Hero */
+    .hero{padding:60px 0 30px}
+    .hero-wrap{display:grid; gap:24px}
+    .hero-title{font-size:clamp(28px, 3vw + 18px, 52px); line-height:1.05; font-weight:900}
+    .hero-sub{color:var(--muted)}
+    .hero-cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:18px}
+    .statbar{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:28px}
+    .stat{background:linear-gradient(180deg, rgba(56,189,248,.10), rgba(56,189,248,.06)); border:1px solid rgba(56,189,248,.25); border-radius:16px; padding:16px}
+    .stat strong{font-size:1.35rem}
+
+    /* Section cards */
+    .section{padding:56px 0}
+    .grid{display:grid; gap:16px}
+    .card{background:var(--card); border:1px solid rgba(148,163,184,.12); border-radius:var(--radius); padding:18px; box-shadow: var(--shadow)}
+    .card h3{margin:0 0 6px}
+    .list{margin:8px 0 0 0; padding:0 0 0 18px}
+
+    /* Pricing */
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px}
+    thead tr{background:rgba(148,163,184,.10)}
+    th, td{padding:12px 14px; border-bottom:1px solid rgba(148,163,184,.12); text-align:left}
+    tbody tr:hover{background:rgba(148,163,184,.06)}
+
+    /* Forms */
+    .field{display:grid; gap:6px; margin:10px 0}
+    .field input, .field select, .field textarea{padding:12px 14px; border-radius:12px; background:#0b162b; border:1px solid rgba(148,163,184,.22); color:var(--text)}
+    .field input:focus, .field select:focus, .field textarea:focus{outline:none; box-shadow: var(--ring); border-color:var(--brand-2)}
+    .form{max-width:560px}
+    .note{color:var(--muted); font-size:.925rem}
+
+    /* Footer */
+    .footer{padding:40px 0 80px; color:#bcd3e7}
+    .footer-grid{display:grid; gap:18px}
+    .copyright{opacity:.8}
+
+    /* Badges & small ui */
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:rgba(16,185,129,.1); color:#c9fddf; border:1px solid rgba(16,185,129,.25); font-weight:700; font-size:.85rem}
+    .kbd{font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding:2px 6px; border-radius:6px; border:1px solid rgba(148,163,184,.28); background:#0a1323}
+
+    /* Hide all pages initially */
+    section[data-page]{display:none}
+    section[data-page].active{display:block}
+
+    /* Desktop layout */
+    @media(min-width: 992px){
+      .nav-links{display:flex}
+      .burger{display:none}
+      .hero{padding:90px 0 40px}
+      .hero-wrap{grid-template-columns:1.1fr .9fr; align-items:center}
+      .statbar{grid-template-columns:repeat(4,1fr)}
+      .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+      .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+      .footer-grid{grid-template-columns:2fr repeat(3,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="#/home" class="brand" aria-label="Halaman utama AlphaPay.id">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3l8.5 5v8L12 21l-8.5-5V8L12 3zm0 2.2L5.5 9v6L12 18.8 18.5 15V9L12 5.2z"/></svg>
+        </span>
+        <span class="brand-title">AlphaPay<span style="color:var(--brand-2)">.id</span></span>
+      </a>
+      <nav aria-label="Navigasi utama" class="nav-links">
+        <div class="nav-item">
+          <button class="nav-btn" data-route="/home">Beranda</button>
+        </div>
+        <div class="nav-item" tabindex="0">
+          <button class="nav-btn" data-route="/produk">Produk & Layanan</button>
+          <div class="dropdown">
+            <a href="#/produk/ppob" data-route="/produk/ppob"><strong>PPOB</strong><span class="pill">Pulsa • PLN • PDAM • E-wallet</span></a>
+            <a href="#/produk/api" data-route="/produk/api"><strong>API & Integrasi</strong><span class="pill">REST • Webhook</span></a>
+            <a href="#/produk/harga" data-route="/produk/harga"><strong>Harga & Fee</strong><span class="pill">Transparan</span></a>
+            <a href="#/produk/coverage" data-route="/produk/coverage"><strong>Coverage Channel</strong><span class="pill">Multi provider</span></a>
+          </div>
+        </div>
+        <div class="nav-item" tabindex="0">
+          <button class="nav-btn" data-route="/cara">Cara Kerja</button>
+          <div class="dropdown">
+            <a href="#/cara/alur" data-route="/cara/alur"><strong>Alur Reseller</strong></a>
+            <a href="#/cara/onboarding" data-route="/cara/onboarding"><strong>Onboarding</strong></a>
+          </div>
+        </div>
+        <div class="nav-item" tabindex="0">
+          <button class="nav-btn" data-route="/keamanan">Keamanan & Kepatuhan</button>
+          <div class="dropdown">
+            <a href="#/keamanan/kyc" data-route="/keamanan/kyc"><strong>KYC & AML</strong></a>
+            <a href="#/keamanan/sla" data-route="/keamanan/sla"><strong>SLA & Status</strong></a>
+          </div>
+        </div>
+        <div class="nav-item" tabindex="0">
+          <button class="nav-btn" data-route="/resource">Resource</button>
+          <div class="dropdown">
+            <a href="#/resource/docs" data-route="/resource/docs"><strong>Dokumentasi API</strong></a>
+            <a href="#/resource/faq" data-route="/resource/faq"><strong>FAQ</strong></a>
+            <a href="#/resource/blog" data-route="/resource/blog"><strong>Blog</strong></a>
+          </div>
+        </div>
+        <div class="nav-item" tabindex="0">
+          <button class="nav-btn" data-route="/tentang">Tentang</button>
+          <div class="dropdown">
+            <a href="#/tentang/profil" data-route="/tentang/profil"><strong>Profil</strong></a>
+            <a href="#/tentang/karier" data-route="/tentang/karier"><strong>Karier</strong></a>
+            <a href="#/tentang/kontak" data-route="/tentang/kontak"><strong>Kontak</strong></a>
+          </div>
+        </div>
+      </nav>
+      <div class="actions">
+        <a class="btn" href="#/resource/status" data-route="/resource/status" aria-label="Cek status layanan">Status</a>
+        <a class="btn primary" href="#/login" data-route="/login" aria-label="Masuk ke akun">Masuk</a>
+        <button id="menuBtn" class="burger" aria-label="Buka menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <header>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span class="logo"><svg viewBox="0 0 24 24"><path d="M12 3l8.5 5v8L12 21l-8.5-5V8L12 3z"/></svg></span>
+        <strong>AlphaPay.id</strong>
+      </div>
+      <button id="closeDrawer" class="burger" aria-label="Tutup menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+    <nav>
+      <a href="#/home">Beranda</a>
+      <details>
+        <summary>Produk & Layanan</summary>
+        <a href="#/produk/ppob">PPOB</a>
+        <a href="#/produk/api">API & Integrasi</a>
+        <a href="#/produk/harga">Harga & Fee</a>
+        <a href="#/produk/coverage">Coverage Channel</a>
+      </details>
+      <details>
+        <summary>Cara Kerja</summary>
+        <a href="#/cara/alur">Alur Reseller</a>
+        <a href="#/cara/onboarding">Onboarding</a>
+      </details>
+      <details>
+        <summary>Keamanan & Kepatuhan</summary>
+        <a href="#/keamanan/kyc">KYC & AML</a>
+        <a href="#/keamanan/sla">SLA & Status</a>
+      </details>
+      <details>
+        <summary>Resource</summary>
+        <a href="#/resource/docs">Dokumentasi API</a>
+        <a href="#/resource/faq">FAQ</a>
+        <a href="#/resource/blog">Blog</a>
+      </details>
+      <details>
+        <summary>Tentang</summary>
+        <a href="#/tentang/profil">Profil</a>
+        <a href="#/tentang/karier">Karier</a>
+        <a href="#/tentang/kontak">Kontak</a>
+      </details>
+      <a href="#/resource/status">Status</a>
+      <a href="#/login">Masuk</a>
+    </nav>
+  </aside>
+
+  <main>
+    <section class="hero container section" data-page id="page-home">
+      <div class="hero-wrap">
+        <div>
+          <span class="badge">Kembali beroperasi di 2025</span>
+          <h1 class="hero-title">Infrastruktur PPOB untuk <span style="color:var(--brand-2)">reseller</span> dan <span style="color:var(--brand)">integrator</span>.</h1>
+          <p class="hero-sub">AlphaPay.id membantu bisnis Anda menjual produk digital dan pembayaran tagihan di Indonesia. Stabil, harga kompetitif, dan siap diintegrasikan ke aplikasi Anda.</p>
+          <div class="hero-cta">
+            <a class="btn primary" href="#/produk/ppob">Jelajahi Layanan</a>
+            <a class="btn" href="#/resource/docs">Mulai Integrasi API</a>
+          </div>
+          <div class="statbar">
+            <div class="stat"><small>Transaksi per hari</small><br><strong>500k+</strong></div>
+            <div class="stat"><small>Uptime 12 bulan</small><br><strong>99.95%</strong></div>
+            <div class="stat"><small>Reseller aktif</small><br><strong>10k+</strong></div>
+            <div class="stat"><small>Channel</small><br><strong>120+</strong></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Quick Start</h3>
+            <ol class="list">
+              <li>Daftar akun <span class="kbd">Masuk</span> lalu pilih <em>Buat Akun Baru</em></li>
+              <li>Lengkapi KYC bisnis Anda</li>
+              <li>Dapatkan API key dan sandbox</li>
+              <li>Topup saldo dan mulai transaksi</li>
+            </ol>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+              <a class="btn" href="#/cara/onboarding">Lihat Onboarding</a>
+              <a class="btn" href="#/produk/harga">Harga & Fee</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Produk: PPOB -->
+    <section class="container section" data-page id="page-produk-ppob">
+      <h2>PPOB</h2>
+      <p class="note">Pulsa, paket data, PLN prabayar dan pascabayar, PDAM, multifinance, BPJS, e-wallet, voucher game, dan lainnya.</p>
+      <div class="grid cols-3">
+        <div class="card"><h3>Telco & Data</h3><ul class="list"><li>Pulsa semua operator</li><li>Paket data</li><li>Pascabayar telco</li></ul></div>
+        <div class="card"><h3>Utilities</h3><ul class="list"><li>Token PLN</li><li>Tagihan PLN</li><li>PDAM</li><li>Gas</li></ul></div>
+        <div class="card"><h3>Finance</h3><ul class="list"><li>Multifinance</li><li>BPJS Kesehatan</li><li>PBB</li></ul></div>
+        <div class="card"><h3>Digital</h3><ul class="list"><li>E-wallet topup</li><li>Voucher game</li><li>Streaming</li></ul></div>
+        <div class="card"><h3>VA & Payment</h3><ul class="list"><li>Virtual Account</li><li>QRIS</li><li>Payment Link</li></ul></div>
+        <div class="card"><h3>Settlement</h3><ul class="list"><li>Realtime report</li><li>Webhook status</li><li>Rekonsiliasi otomatis</li></ul></div>
+      </div>
+    </section>
+
+    <!-- Produk: API -->
+    <section class="container section" data-page id="page-produk-api">
+      <h2>API & Integrasi</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>REST API</h3>
+          <p>Endpoint sederhana dengan JSON. Otorisasi menggunakan bearer token. Webhook untuk status transaksi.</p>
+<pre class="card" style="overflow:auto; white-space:pre; background:#0a1323">POST /v1/orders
+Authorization: Bearer &lt;API_KEY&gt;
+{
+  "product_id": "pln-prepaid",
+  "customer_no": "5489xxxxxxx",
+  "ref_id": "INV-2025-0001"
+}
+</pre>
+        </div>
+        <div class="card">
+          <h3>Keamanan</h3>
+          <ul class="list">
+            <li>Rate limiting per API key</li>
+            <li>Signature opsional HMAC</li>
+            <li>Whitelist IP dan rotasi key</li>
+          </ul>
+          <a class="btn" href="#/resource/docs">Buka Dokumentasi</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Produk: Harga -->
+    <section class="container section" data-page id="page-produk-harga">
+      <h2>Harga & Fee</h2>
+      <p class="note">Skema harga fleksibel berdasarkan volume. Tidak ada biaya tersembunyi.</p>
+      <div class="card">
+        <table>
+          <thead><tr><th>Kategori</th><th>Produk</th><th>Fee per transaksi</th><th>SLA</th></tr></thead>
+          <tbody>
+            <tr><td>Utilities</td><td>PLN Prabayar</td><td>Rp 1.200</td><td>Realtime</td></tr>
+            <tr><td>Utilities</td><td>PLN Pascabayar</td><td>Rp 2.000</td><td>&lt; 60 detik</td></tr>
+            <tr><td>Digital</td><td>E-wallet Topup</td><td>0.8% capped</td><td>Realtime</td></tr>
+            <tr><td>Telco</td><td>Pulsa</td><td>Tiered by denom</td><td>Realtime</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Produk: Coverage -->
+    <section class="container section" data-page id="page-produk-coverage">
+      <h2>Coverage Channel</h2>
+      <div class="grid cols-3">
+        <div class="card"><h3>Provider Telco</h3><p>Telkomsel, Indosat, XL, Tri, Smartfren</p></div>
+        <div class="card"><h3>Utilities</h3><p>PLN, PDAM kota besar, PGN</p></div>
+        <div class="card"><h3>E-wallet</h3><p>GoPay, OVO, DANA, LinkAja, ShopeePay</p></div>
+      </div>
+    </section>
+
+    <!-- Cara: Alur -->
+    <section class="container section" data-page id="page-cara-alur">
+      <h2>Alur Reseller</h2>
+      <ol class="list">
+        <li>Daftar akun dan lengkapi profil</li>
+        <li>Verifikasi KYC</li>
+        <li>Deposit saldo</li>
+        <li>Transaksi lewat portal atau API</li>
+        <li>Tarik dana sesuai kebutuhan</li>
+      </ol>
+    </section>
+
+    <!-- Cara: Onboarding -->
+    <section class="container section" data-page id="page-cara-onboarding">
+      <h2>Onboarding</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Prasyarat</h3>
+          <ul class="list"><li>Identitas legal bisnis</li><li>Rekening bank</li><li>Kontak penanggung jawab</li></ul>
+        </div>
+        <div class="card">
+          <h3>Waktu Proses</h3>
+          <p>Umumnya 1 sampai 3 hari kerja setelah dokumen lengkap.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Keamanan: KYC -->
+    <section class="container section" data-page id="page-keamanan-kyc">
+      <h2>KYC & AML</h2>
+      <p class="note">Kami mematuhi kebijakan KYC dan AML yang berlaku di Indonesia. Semua mitra wajib verifikasi data.</p>
+      <div class="grid cols-2">
+        <div class="card"><h3>Proses</h3><ul class="list"><li>Verifikasi identitas</li><li>Validasi rekening</li><li>Compliance check</li></ul></div>
+        <div class="card"><h3>Perlindungan Data</h3><p>Enkripsi, akses terbatas, audit berkala.</p></div>
+      </div>
+    </section>
+
+    <!-- Keamanan: SLA -->
+    <section class="container section" data-page id="page-keamanan-sla">
+      <h2>SLA & Status</h2>
+      <p>Target uptime 99.95 persen dengan pemantauan 24 jam. Lihat halaman status untuk jadwal pemeliharaan.</p>
+      <a class="btn" href="#/resource/status">Buka Status</a>
+    </section>
+
+    <!-- Resource: Docs -->
+    <section class="container section" data-page id="page-resource-docs">
+      <h2>Dokumentasi API</h2>
+      <div class="grid cols-2">
+        <div class="card"><h3>Autentikasi</h3><p>Gunakan header Authorization Bearer. Rotasi key berkala disarankan.</p></div>
+        <div class="card"><h3>Webhook</h3><p>Konfirmasi status transaksi melalui webhook idempotent dengan signature HMAC.</p></div>
+        <div class="card"><h3>Produk</h3><p>Endpoint katalog untuk memuat daftar produk terbaru beserta denom.</p></div>
+        <div class="card"><h3>Sandbox</h3><p>Gunakan environment sandbox untuk pengujian sebelum go live.</p></div>
+      </div>
+    </section>
+
+    <!-- Resource: FAQ -->
+    <section class="container section" data-page id="page-resource-faq">
+      <h2>FAQ</h2>
+      <details class="card"><summary><strong>Bagaimana cara menjadi reseller</strong></summary><p>Daftar akun, lengkapi KYC, deposit saldo, lalu transaksi melalui portal atau API.</p></details>
+      <details class="card"><summary><strong>Metode deposit saldo</strong></summary><p>VA, QRIS, transfer bank, dan e-wallet tertentu.</p></details>
+      <details class="card"><summary><strong>Berapa waktu penyelesaian</strong></summary><p>Umumnya realtime. Beberapa channel memerlukan hingga 60 detik.</p></details>
+    </section>
+
+    <!-- Resource: Blog -->
+    <section class="container section" data-page id="page-resource-blog">
+      <h2>Blog</h2>
+      <div class="grid cols-3">
+        <article class="card"><h3>Kembali di 2025</h3><p>Perjalanan AlphaPay.id dari 2019 hingga relaunch 2025.</p></article>
+        <article class="card"><h3>Optimasi Fee</h3><p>Cara membaca struktur harga dan memilih channel terbaik.</p></article>
+        <article class="card"><h3>Integrasi Cepat</h3><p>Checklist integrasi API yang ringkas untuk tim Anda.</p></article>
+      </div>
+    </section>
+
+    <!-- Resource: Status -->
+    <section class="container section" data-page id="page-resource-status">
+      <h2>Status Layanan</h2>
+      <div class="grid cols-3">
+        <div class="card"><h3>Core API</h3><p>Operasional</p><span class="badge" style="background:rgba(16,185,129,.15); border-color:rgba(16,185,129,.3)">OK</span></div>
+        <div class="card"><h3>Webhook</h3><p>Operasional</p><span class="badge">OK</span></div>
+        <div class="card"><h3>Portal</h3><p>Operasional</p><span class="badge">OK</span></div>
+      </div>
+      <p class="note">Jika ada gangguan, informasi akan diperbarui di halaman ini.</p>
+    </section>
+
+    <!-- Tentang: Profil -->
+    <section class="container section" data-page id="page-tentang-profil">
+      <h2>Profil Perusahaan</h2>
+      <p>AlphaPay.id adalah platform infrastruktur pembayaran dan PPOB. Kami melayani reseller, aggregator, dan integrator di seluruh Indonesia.</p>
+      <div class="grid cols-3">
+        <div class="card"><h3>Misi</h3><p>Memudahkan akses pembayaran digital bagi semua pelaku usaha.</p></div>
+        <div class="card"><h3>Nilai</h3><p>Keandalan, transparansi, dan fokus pada mitra.</p></div>
+        <div class="card"><h3>Tim</h3><p>Insinyur dan operator berpengalaman di bidang pembayaran.</p></div>
+      </div>
+    </section>
+
+    <!-- Tentang: Karier -->
+    <section class="container section" data-page id="page-tentang-karier">
+      <h2>Karier</h2>
+      <p class="note">Bergabunglah untuk membangun infrastruktur pembayaran yang andal.</p>
+      <div class="card">
+        <ul class="list">
+          <li>Backend Engineer</li>
+          <li>DevOps Engineer</li>
+          <li>Business Development</li>
+          <li>Customer Operations</li>
+        </ul>
+        <p style="margin-top:10px">Kirim CV ke <a href="mailto:careers@alphapay.id">careers@alphapay.id</a></p>
+      </div>
+    </section>
+
+    <!-- Tentang: Kontak -->
+    <section class="container section" data-page id="page-tentang-kontak">
+      <h2>Kontak</h2>
+      <form class="form card" onsubmit="event.preventDefault(); alert('Terima kasih. Pesan Anda sudah terkirim.'); this.reset();">
+        <div class="field">
+          <label>Nama</label>
+          <input required placeholder="Nama Anda" />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" required placeholder="email@anda" />
+        </div>
+        <div class="field">
+          <label>Pesan</label>
+          <textarea rows="4" required placeholder="Tulis kebutuhan Anda"></textarea>
+        </div>
+        <button class="btn primary" type="submit">Kirim</button>
+      </form>
+    </section>
+
+    <!-- Login Page -->
+    <section class="container section" data-page id="page-login">
+      <h2>Masuk ke AlphaPay.id</h2>
+      <form class="form card" id="loginForm">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="email@anda" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label>Kata Sandi</label>
+          <input type="password" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
+          <label style="display:flex; align-items:center; gap:8px"><input type="checkbox" id="remember" /> Ingat saya</label>
+          <a href="#" onclick="alert('Silakan hubungi support untuk reset sandi.'); return false">Lupa kata sandi</a>
+        </div>
+        <button class="btn primary" type="submit">Masuk</button>
+        <p class="note">Belum punya akun? <a href="#" onclick="alert('Pendaftaran akun akan dibuka setelah verifikasi KYC.'); return false">Daftar akun</a></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer container">
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+          <span class="logo"><svg viewBox="0 0 24 24"><path d="M12 3l8.5 5v8L12 21l-8.5-5V8L12 3z"/></svg></span>
+          <strong>AlphaPay.id</strong>
+        </div>
+        <p class="note">Platform reseller PPOB dan API pembayaran. Cepat, aman, terukur.</p>
+      </div>
+      <div>
+        <strong>Produk</strong>
+        <ul class="list">
+          <li><a href="#/produk/ppob">PPOB</a></li>
+          <li><a href="#/produk/api">API</a></li>
+          <li><a href="#/produk/harga">Harga</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong>Resource</strong>
+        <ul class="list">
+          <li><a href="#/resource/docs">Dokumentasi</a></li>
+          <li><a href="#/resource/faq">FAQ</a></li>
+          <li><a href="#/resource/status">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong>Tentang</strong>
+        <ul class="list">
+          <li><a href="#/tentang/profil">Profil</a></li>
+          <li><a href="#/tentang/karier">Karier</a></li>
+          <li><a href="#/tentang/kontak">Kontak</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© <span id="year"></span> AlphaPay.id • All rights reserved</p>
+  </footer>
+
+  <script>
+    // Router config: map routes to section ids
+    const routes = {
+      '/home': 'page-home',
+      '/produk/ppob': 'page-produk-ppob',
+      '/produk/api': 'page-produk-api',
+      '/produk/harga': 'page-produk-harga',
+      '/produk/coverage': 'page-produk-coverage',
+      '/cara/alur': 'page-cara-alur',
+      '/cara/onboarding': 'page-cara-onboarding',
+      '/keamanan/kyc': 'page-keamanan-kyc',
+      '/keamanan/sla': 'page-keamanan-sla',
+      '/resource/docs': 'page-resource-docs',
+      '/resource/faq': 'page-resource-faq',
+      '/resource/blog': 'page-resource-blog',
+      '/resource/status': 'page-resource-status',
+      '/tentang/profil': 'page-tentang-profil',
+      '/tentang/karier': 'page-tentang-karier',
+      '/tentang/kontak': 'page-tentang-kontak',
+      '/login': 'page-login'
+    };
+
+    const defaultRoute = '/home';
+
+    function setActiveNav(route){
+      document.querySelectorAll('.nav-btn, a[data-route]').forEach(el=>{
+        const r = el.getAttribute('data-route');
+        if(!r) return;
+        el.removeAttribute('aria-current');
+        if(route.startsWith(r)) el.setAttribute('aria-current','page');
+      });
+    }
+
+    function render(route){
+      const pageId = routes[route] || routes[defaultRoute];
+      document.querySelectorAll('section[data-page]').forEach(s=>s.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      setActiveNav(route);
+      // close mobile drawer if open
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden','true');
+      // update title
+      const titleMap = {
+        '/home': 'Beranda',
+        '/produk/ppob': 'PPOB',
+        '/produk/api': 'API',
+        '/produk/harga': 'Harga',
+        '/produk/coverage': 'Coverage',
+        '/cara/alur': 'Alur Reseller',
+        '/cara/onboarding': 'Onboarding',
+        '/keamanan/kyc': 'KYC & AML',
+        '/keamanan/sla': 'SLA & Status',
+        '/resource/docs': 'Dokumentasi API',
+        '/resource/faq': 'FAQ',
+        '/resource/blog': 'Blog',
+        '/resource/status': 'Status',
+        '/tentang/profil': 'Profil',
+        '/tentang/karier': 'Karier',
+        '/tentang/kontak': 'Kontak',
+        '/login': 'Masuk'
+      };
+      document.title = `AlphaPay.id - ${titleMap[route] || 'Reseller PPOB'}`;
+    }
+
+    // Initial route
+    function getRoute(){
+      const hash = location.hash.replace('#','');
+      return hash || defaultRoute;
+    }
+
+    window.addEventListener('hashchange', ()=>render(getRoute()));
+    window.addEventListener('load', ()=>{
+      // enhance menu buttons
+      document.querySelectorAll('[data-route]').forEach(el=>{
+        el.addEventListener('click', e=>{
+          const r = el.getAttribute('data-route');
+          if(r){ location.hash = r; }
+        });
+      });
+      // year
+      document.getElementById('year').textContent = new Date().getFullYear();
+      // render first time
+      if(!location.hash) location.hash = defaultRoute;
+      render(getRoute());
+    });
+
+    // Mobile drawer controls
+    const drawer = document.getElementById('drawer');
+    document.getElementById('menuBtn').addEventListener('click', ()=>{
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden','false');
+    });
+    document.getElementById('closeDrawer').addEventListener('click', ()=>{
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden','true');
+    });
+
+    // Login form handler (placeholder only)
+    document.getElementById('loginForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
+      if(email && pass){
+        alert('Masuk berhasil. Selamat datang kembali.');
+        location.hash = '/home';
+      }
+    });
+
+    // Create Manifest dynamically (single-file)
+    const manifest = {
+      name: 'AlphaPay.id',
+      short_name: 'AlphaPay',
+      start_url: './#/home',
+      display: 'standalone',
+      background_color: '#0b1220',
+      theme_color: '#0ea5e9',
+      icons: [
+        { src: makeIconSVG('#0ea5e9'), sizes: '192x192', type: 'image/svg+xml' },
+        { src: makeIconSVG('#38bdf8'), sizes: '512x512', type: 'image/svg+xml' }
+      ]
+    };
+
+    function makeIconSVG(color){
+      const svg = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect rx="78" width="512" height="512" fill="${color}"/><path fill="white" d="M256 90l181 106v212L256 422 75 408V196z"/></svg>`);
+      return `data:image/svg+xml,${svg}`;
+    }
+
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    document.head.appendChild(link);
+
+    // Register Service Worker from a blob so we stay single-file
+    const swCode = `
+      const CACHE = 'alphapay-singlefile-v1';
+      self.addEventListener('install', e=>{
+        e.waitUntil((async()=>{
+          const c = await caches.open(CACHE);
+          try{ await c.addAll([self.registration.scope]); }catch(err){ /* ignore */ }
+          self.skipWaiting();
+        })());
+      });
+      self.addEventListener('activate', e=>{
+        e.waitUntil((async()=>{
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k=>k===CACHE?null:caches.delete(k)));
+          self.clients.claim();
+        })());
+      });
+      self.addEventListener('fetch', e=>{
+        const req = e.request;
+        if(req.method!=='GET') return;
+        e.respondWith((async()=>{
+          const cache = await caches.open(CACHE);
+          const cached = await cache.match(req);
+          if(cached) return cached;
+          try{
+            const res = await fetch(req);
+            if(res.ok) cache.put(req, res.clone());
+            return res;
+          }catch(err){
+            // fallback to root if offline
+            const root = await cache.match(self.registration.scope);
+            return root || Response.error();
+          }
+        })());
+      });
+    `;
+
+    if('serviceWorker' in navigator){
+      const swBlob = new Blob([swCode], {type:'text/javascript'});
+      const swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl).catch(()=>{});
+    }
+  </script>
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AlphaPay.id",
+    "url": "https://alphapay.id/",
+    "logo": "https://alphapay.id/icon.svg",
+    "sameAs": [],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "support@alphapay.id"
+    }
+  }
+  </script>
+</body>
+</html>
